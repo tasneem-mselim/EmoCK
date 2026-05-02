@@ -41,7 +41,7 @@ labels = pd.read_csv(labels_csv)
 # =========================
 merged = pd.merge(labels, submission, on="id")
 
-y_true = merged["target_groundTruth"]
+y_true = merged["label"]
 y_pred = merged["target"]
 
 accuracy = round(accuracy_score(y_true, y_pred) * 100, 2)
