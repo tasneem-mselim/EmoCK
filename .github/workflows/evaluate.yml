@@ -31,12 +31,12 @@ jobs:
           ref: main
           path: main_repo
 
-      # 3. Checkout private labels repo
+      # 3. Checkout private labels repo (FIXED: use PAT)
       - name: Checkout private labels
         uses: actions/checkout@v4
         with:
           repository: tasneem-mselim/hlm-vision-private
-          token: ${{ github.token }}
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
           path: private_data
           sparse-checkout: |
             emoCK.csv
@@ -54,7 +54,7 @@ jobs:
       - name: Validate submission
         run: |
           if ! ls pr_repo/submission/*.enc 1> /dev/null 2>&1; then
-            echo "❌ No .enc submission file found"
+            echo "❌ No .enc file found"
             exit 1
           fi
 
@@ -92,14 +92,13 @@ jobs:
             exit 1
           fi
 
-      # 9. Evaluate submission
+      # 9. Evaluate submission (FIXED filename)
       - name: Evaluate submission
         env:
           GITHUB_ACTOR: ${{ github.actor }}
         run: |
           cd main_repo
-
-          python evaluate.py decrypted.csv ../private_data/test_labels_only.csv
+          python evaluate.py decrypted.csv ../private_data/emoCK.csv
 
       # 10. Generate leaderboard HTML
       - name: Generate leaderboard
@@ -107,7 +106,7 @@ jobs:
           cd main_repo
           python generate_leaderboard_html.py
 
-      # 11. Commit leaderboard
+      # 11. Commit leaderboard safely
       - name: Push leaderboard
         run: |
           cd main_repo
@@ -119,13 +118,12 @@ jobs:
 
           if ! git diff --cached --quiet; then
             git commit -m "Update leaderboard PR #${{ github.event.pull_request.number }}"
-            git pull --rebase origin main
+            git pull --rebase origin main || exit 1
             git push origin HEAD:main
           else
             echo "No leaderboard changes"
           fi
 
-      # 12. Cleanup sensitive files
+      # 12. Cleanup
       - name: Cleanup
-        run: |
-          rm -f private_key.pem
+        run: rm -f private_key.pem
