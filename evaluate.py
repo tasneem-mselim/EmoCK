@@ -39,10 +39,13 @@ labels = pd.read_csv(labels_csv)
 # =========================
 # Merge and evaluate
 # =========================
+labels = labels.rename(columns={"label": "true_label"})
+submission = submission.rename(columns={"label": "pred_label"})
+
 merged = pd.merge(labels, submission, on="id")
 
-y_true = merged["label"]
-y_pred = merged["target"]
+y_true = merged["true_label"]
+y_pred = merged["pred_label"]
 
 accuracy = round(accuracy_score(y_true, y_pred) * 100, 2)
 f1 = round(f1_score(y_true, y_pred, average="macro") * 100, 2)
