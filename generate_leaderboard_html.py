@@ -120,7 +120,7 @@ tr:nth-child(even) {{
 
 <body>
 
-<h1>🏆 Leaderboard (Ranking by {metric_col})</h1>
+<h1>🏆 Leaderboard </h1>
 
 <table>
 <tr>
@@ -163,7 +163,7 @@ Mean {stats['f1_mean']:.4f} | Median {stats['f1_median']:.4f} | Std {stats['f1_s
 </html>
 """
 
-with open("final_leaderboard.html", "w", encoding="utf-8") as f:
+with open("index.html", "w", encoding="utf-8") as f:
     f.write(html_content)
 
 print(f"✅ Leaderboard generated using {metric_col}")
